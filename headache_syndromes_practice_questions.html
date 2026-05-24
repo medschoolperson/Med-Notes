@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Headache Syndromes — Practice Questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f6f2; --card: #ffffff; --ink: #1c1c1c; --muted: #6b6b6b;
+    --border: #e2e0d8; --accent: #2a5fa8; --correct: #1a6e40;
+    --correct-bg: #eaf7ef; --wrong: #9b2424; --wrong-bg: #fdf0f0;
+    --reveal-bg: #f0f4fc; --reveal-border: #b8ccee;
+    --tag: #e8eef8; --tag-ink: #2a5fa8;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.6; padding: 2rem 1rem 4rem; }
+  .page-header { max-width: 720px; margin: 0 auto 2.5rem; }
+  .header-tag { font-family: 'DM Mono', monospace; font-size: 11.5px; background: var(--tag); color: var(--tag-ink); padding: 3px 10px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+  .page-header h1 { font-family: 'Libre Baskerville', serif; font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .page-header p { font-size: 13.5px; color: var(--muted); font-style: italic; }
+  .score-bar { max-width: 720px; margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; gap: 12px; }
+  .score-text { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
+  .score-label { font-size: 13px; color: var(--muted); }
+  .bar-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-reset { font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; }
+  .btn-reset:hover { background: #ede9e0; }
+  .toggle-label { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+  .toggle-switch { width: 34px; height: 18px; background: #ccc; border-radius: 10px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+  .toggle-switch.on { background: var(--accent); }
+  .toggle-switch::after { content: ''; position: absolute; width: 14px; height: 14px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: left 0.2s; }
+  .toggle-switch.on::after { left: 18px; }
+  .q-card { max-width: 720px; margin: 0 auto 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .q-header { padding: 1.25rem 1.5rem 1rem; border-bottom: 1px solid var(--border); }
+  .q-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); font-weight: 500; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .q-type-badge { display: inline-block; font-size: 10px; font-family: 'DM Mono', monospace; background: var(--tag); color: var(--tag-ink); padding: 2px 7px; border-radius: 4px; margin-left: 8px; vertical-align: middle; }
+  .q-text { font-family: 'Libre Baskerville', serif; font-size: 15.5px; line-height: 1.65; }
+  .choices { padding: 0.75rem 1.5rem; display: flex; flex-direction: column; gap: 8px; }
+  .choice { display: flex; align-items: flex-start; gap: 10px; padding: 9px 13px; border: 1.5px solid var(--border); border-radius: 7px; cursor: pointer; background: transparent; text-align: left; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); width: 100%; transition: border-color 0.12s, background 0.12s; }
+  .choice:hover:not(:disabled) { border-color: var(--accent); background: #f0f4fc; }
+  .choice.selected { border-color: var(--accent); background: #f0f4fc; }
+  .choice.correct-reveal { border-color: var(--correct); background: var(--correct-bg); }
+  .choice.wrong-reveal { border-color: var(--wrong); background: var(--wrong-bg); }
+  .choice:disabled { cursor: default; }
+  .letter-badge { font-family: 'DM Mono', monospace; font-size: 11.5px; font-weight: 500; width: 22px; height: 22px; border-radius: 4px; background: var(--bg); color: var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; border: 1px solid var(--border); }
+  .choice.selected .letter-badge { background: var(--accent); color: white; border-color: var(--accent); }
+  .choice.correct-reveal .letter-badge { background: var(--correct); color: white; border-color: var(--correct); }
+  .choice.wrong-reveal .letter-badge { background: var(--wrong); color: white; border-color: var(--wrong); }
+  .reveal-row { padding: 0.5rem 1.5rem 1rem; display: flex; align-items: center; gap: 12px; }
+  .btn-check { font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600; padding: 8px 20px; border-radius: 7px; border: none; background: var(--accent); color: white; cursor: pointer; transition: opacity 0.15s; }
+  .btn-check:disabled { opacity: 0.35; cursor: default; }
+  .btn-check.result-correct { background: var(--correct); }
+  .btn-check.result-wrong { background: var(--wrong); }
+  .explanation { display: none; border-top: 1px solid var(--reveal-border); background: var(--reveal-bg); padding: 1.1rem 1.5rem; }
+  .explanation.visible { display: block; }
+  .correct-line { font-size: 13.5px; font-weight: 600; color: var(--correct); margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--reveal-border); }
+  .exp-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 9px; font-size: 13.5px; line-height: 1.6; }
+  .exp-letter { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .exp-letter.correct { background: var(--correct); color: white; }
+  .exp-letter.wrong { background: #d9d9d9; color: #555; }
+  .exp-text strong { font-weight: 600; }
+  @media print { body { background: white; padding: 0.4in 0.5in; } .score-bar, .btn-check, .btn-reset, .toggle-label { display: none !important; } .explanation { display: block !important; } .q-card { break-inside: avoid; margin-bottom: 1.2rem; } }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-tag">Dr. Fatima Traoré · Introduction to Headache Syndromes</div>
+  <h1>Practice Questions</h1>
+  <p>Select an answer, then click 'Check Answer' to reveal the explanation.</p>
+</div>
+
+<div class="score-bar">
+  <div>
+    <span class="score-label">Score: </span>
+    <span class="score-text" id="score-display">0 / 0</span>
+    <span class="score-label"> answered</span>
+  </div>
+  <div class="bar-actions">
+    <label class="toggle-label" onclick="toggleAll()">
+      <div class="toggle-switch" id="show-all-toggle"></div>
+      Show all answers
+    </label>
+    <button class="btn-reset" onclick="resetAll()">Reset All</button>
+  </div>
+</div>
+
+<!-- Q1 -->
+<div class="q-card" id="card-q1">
+  <div class="q-header">
+    <div class="q-num">Q1 <span class="q-type-badge">CONTRAST / DISTINCTION</span></div>
+    <div class="q-text">A medical student is trying to distinguish the three major primary headache types. Which of the following correctly contrasts tension-type headache (TTH) from migraine?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q1" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>TTH is typically unilateral, whereas migraine is bilateral.</button>
+    <button class="choice" data-q="q1" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>TTH can present with both photophobia and phonophobia simultaneously, whereas migraine allows only one.</button>
+    <button class="choice" data-q="q1" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>TTH is non-pulsating and mild-to-moderate in severity, whereas migraine is pulsating and moderate-to-severe.</button>
+    <button class="choice" data-q="q1" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>Migraine is never associated with nausea or vomiting, while TTH frequently causes gastrointestinal symptoms.</button>
+    <button class="choice" data-q="q1" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>TTH attacks last at least 4 hours and are aggravated by routine physical activity.</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q1" disabled onclick="revealAnswer('q1')">Check Answer</button></div>
+  <div class="explanation" id="exp-q1">
+    <div class="correct-line">&#10003; Correct Answer: C — TTH is non-pulsating and mild-to-moderate in severity, whereas migraine is pulsating and moderate-to-severe.</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect.</strong> This is reversed. TTH is typically <strong>bilateral</strong> (squeezing/pressure), while migraine is classically <strong>unilateral</strong> — though either can occasionally present on the other side.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">B</span><span class="exp-text"><strong>Incorrect.</strong> Also reversed. By ICHD-3, <strong>TTH allows no more than one</strong> of photophobia or phonophobia — never both. <strong>Migraine</strong> requires both photophobia and phonophobia (or nausea/vomiting). This is one of the highest-yield distinctions in the lecture.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">C</span><span class="exp-text"><strong>Correct.</strong> TTH is characterized by a <strong>pressing or tightening (non-pulsating)</strong> quality at <strong>mild-to-moderate</strong> intensity — the kind of headache you can push through your day with. Migraine is <strong>pulsating</strong> and <strong>moderate-to-severe</strong>, often requiring the patient to stop activity and lie in a dark room.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect.</strong> Backwards. <strong>TTH has NO nausea or vomiting</strong> by definition. Migraine is frequently associated with nausea and/or vomiting — a core criterion D feature in ICHD-3.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> These features describe <strong>migraine</strong>. Migraine lasts <strong>4–72 hours</strong> and IS aggravated by routine activity. TTH lasts <strong>30 minutes to 7 days</strong> and is notably <em>not</em> aggravated by routine activity.</span></div>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="q-card" id="card-q2">
+  <div class="q-header">
+    <div class="q-num">Q2 <span class="q-type-badge">CLINICAL VIGNETTE</span></div>
+    <div class="q-text">A 38-year-old male smoker presents with episodic, excruciating left-sided periorbital pain that wakes him from sleep. Each attack lasts about 45 minutes, occurs once or twice daily, and has been happening every autumn for the past three years. During attacks he paces the room and cannot sit still. His left eye shows ptosis and miosis. Between attacks he feels completely normal. What is the most likely diagnosis?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q2" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>Migraine without aura</button>
+    <button class="choice" data-q="q2" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>Episodic cluster headache</button>
+    <button class="choice" data-q="q2" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>Tension-type headache</button>
+    <button class="choice" data-q="q2" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>Trigeminal neuralgia</button>
+    <button class="choice" data-q="q2" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>Idiopathic intracranial hypertension</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q2" disabled onclick="revealAnswer('q2')">Check Answer</button></div>
+  <div class="explanation" id="exp-q2">
+    <div class="correct-line">&#10003; Correct Answer: B — Episodic cluster headache</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect.</strong> Migraine lasts <strong>4–72 hours</strong>, not 45 minutes. Migraineurs want to <strong>lie still in a dark room</strong>, not pace. Migraine also lacks prominent ipsilateral Horner-like features and strict seasonal/circadian periodicity.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">B</span><span class="exp-text"><strong>Correct.</strong> Textbook cluster headache: <strong>male smoker</strong> (risk factors), unilateral periorbital pain in <strong>V1 distribution</strong>, attacks <strong>15 min–3 hours</strong>, <strong>circadian</strong> (wakes from sleep) and <strong>circannual</strong> (every autumn) periodicity, <strong>restlessness/pacing</strong> (opposite of migraine), ipsilateral <strong>Horner syndrome</strong> (ptosis + miosis), and <strong>complete return to baseline</strong> between attacks. "Episodic" because pain-free periods exceed 3 months.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">C</span><span class="exp-text"><strong>Incorrect.</strong> TTH is <strong>bilateral, mild-to-moderate, non-pulsating</strong>, and never produces ipsilateral autonomic features like Horner syndrome or a seasonal attack pattern.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect.</strong> Trigeminal neuralgia causes <strong>brief electric-shock facial pain lasting seconds</strong>, triggered by light touch (eating, talking). It does not cause autonomic features, seasonal periodicity, or attacks lasting 45 minutes.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> IIH presents in <strong>obese women 20–45</strong> with daily positional headaches, papilledema, and CN VI palsy — not short episodic attacks with Horner syndrome and seasonal clustering.</span></div>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="q-card" id="card-q3">
+  <div class="q-header">
+    <div class="q-num">Q3 <span class="q-type-badge">FACT / MECHANISM</span></div>
+    <div class="q-text">A patient with migraine reports that during attacks, even a light touch to her scalp is painful, and any physical movement makes the headache worse. Which of the following best explains this phenomenon?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q3" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>Activation of the sphenopalatine ganglion releasing acetylcholine directly onto meningeal vessels</button>
+    <button class="choice" data-q="q3" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>Cortical spreading depression originating in the motor cortex causing permanent structural changes</button>
+    <button class="choice" data-q="q3" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>Central and peripheral sensitization following trigeminal activation, lowering the pain threshold so normally non-painful stimuli become painful (allodynia)</button>
+    <button class="choice" data-q="q3" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>Vasodilation of cerebral arteries compressing the trigeminal nerve root at the brainstem</button>
+    <button class="choice" data-q="q3" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>Increased GABA release from the periaqueductal gray suppressing descending pain modulation</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q3" disabled onclick="revealAnswer('q3')">Check Answer</button></div>
+  <div class="explanation" id="exp-q3">
+    <div class="correct-line">&#10003; Correct Answer: C — Central and peripheral sensitization following trigeminal activation, lowering the pain threshold so normally non-painful stimuli become painful (allodynia)</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect.</strong> The sphenopalatine ganglion (SPG) contributes to autonomic features seen in cluster headache. It is not the primary mechanism behind cutaneous allodynia during migraine.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">B</span><span class="exp-text"><strong>Incorrect.</strong> Cortical spreading depression originates in the <strong>occipital cortex</strong>, not the motor cortex, and causes <strong>transient reversible</strong> depolarization — not permanent structural changes. It contributes to aura and triggers trigeminal activation.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">C</span><span class="exp-text"><strong>Correct.</strong> Step 3 of migraine pathophysiology is <strong>sensitization</strong>. After CSD activates the trigeminal nucleus caudalis (Step 2), progressive <strong>peripheral and central sensitization</strong> lowers the pain threshold. This produces <strong>allodynia</strong> — stimuli that should not be painful (scalp touch, light, sound) become painful — and explains why physical activity exacerbates the headache.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect.</strong> The older vascular theory proposed vessel dilation caused migraine pain. Current understanding is that <strong>primary neural dysfunction</strong> drives migraine — the trigeminal system activates first and vascular changes are secondary, not causative.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> The PAG normally <strong>inhibits pain via descending pathways</strong>. Increased GABA from PAG would enhance inhibition and reduce pain — the opposite of what produces allodynia. Migraine involves dysregulation of this modulatory system.</span></div>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="q-card" id="card-q4">
+  <div class="q-header">
+    <div class="q-num">Q4 <span class="q-type-badge">FACT / MECHANISM</span></div>
+    <div class="q-text">Using the SNOOP mnemonic for secondary headache red flags, which of the following patient presentations should raise the LEAST concern for a dangerous secondary cause?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q4" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>A 55-year-old woman with no prior headache history who develops a new temporal headache with jaw claudication</button>
+    <button class="choice" data-q="q4" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>A 30-year-old man whose severe headache reached maximum intensity within 60 seconds of onset</button>
+    <button class="choice" data-q="q4" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>A 28-year-old woman with a known 10-year history of migraine who reports her typical unilateral throbbing headache</button>
+    <button class="choice" data-q="q4" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>A 40-year-old HIV-positive patient with new-onset headache, fever, and neck stiffness</button>
+    <button class="choice" data-q="q4" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>A 45-year-old man with a headache that is worse when he stands and relieves when he lies flat</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q4" disabled onclick="revealAnswer('q4')">Check Answer</button></div>
+  <div class="explanation" id="exp-q4">
+    <div class="correct-line">&#10003; Correct Answer: C — A 28-year-old woman with a known 10-year history of migraine who reports her typical unilateral throbbing headache</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect (this IS a red flag).</strong> New headache after age 50 with jaw claudication and temporal pain maps directly to SNOOP <strong>"O — Older age"</strong> and strongly suggests <strong>Giant Cell Arteritis</strong>. Risk of irreversible vision loss makes this a medical emergency.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">B</span><span class="exp-text"><strong>Incorrect (this IS a red flag).</strong> Maximum intensity within 60 seconds = classic <strong>thunderclap headache</strong> — SNOOP <strong>"O — Onset sudden."</strong> This is SAH until proven otherwise and requires immediate non-contrast CT followed by LP if CT is negative.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">C</span><span class="exp-text"><strong>Correct — LEAST concerning.</strong> A well-established migraineur experiencing her <strong>typical, unchanged headache</strong> triggers no SNOOP red flags. The critical question is always whether the headache is <strong>new, changed, or progressive</strong>. A known pattern is reassuring — the concern arises when something is different.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect (this IS a red flag).</strong> HIV is an explicit secondary risk factor under SNOOP <strong>"S."</strong> With fever and neck stiffness, this presentation is highly suspicious for <strong>meningitis</strong> and requires immediate LP and empirical antibiotics. Immunosuppressed patients may present atypically — maintain high suspicion.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect (this IS a red flag).</strong> Positional headache — worse upright, better lying flat — is SNOOP <strong>"P — Positional"</strong> and suggests <strong>intracranial hypotension</strong> (e.g., CSF leak). Neither pattern is consistent with primary headache.</span></div>
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="q-card" id="card-q5">
+  <div class="q-header">
+    <div class="q-num">Q5 <span class="q-type-badge">CLINICAL VIGNETTE</span></div>
+    <div class="q-text">A 32-year-old obese woman presents with daily headaches worse in the morning, brief visual graying when standing, and a pulsatile whooshing sound in her ears. Fundoscopy shows bilateral disc swelling. MRI brain and MR venogram are normal. LP reveals an opening pressure of 310 mmH₂O with completely normal CSF composition. Which of the following represents the definitive long-term treatment for this condition?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q5" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>Emergent high-dose corticosteroids to reduce intracranial inflammation</button>
+    <button class="choice" data-q="q5" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>Subcutaneous sumatriptan for acute headache episodes</button>
+    <button class="choice" data-q="q5" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>Weight loss, with acetazolamide as a pharmacologic adjunct to reduce CSF production</button>
+    <button class="choice" data-q="q5" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>Prophylactic propranolol to lower intracranial pressure</button>
+    <button class="choice" data-q="q5" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>Single therapeutic lumbar puncture draining 30 mL CSF as a definitive cure</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q5" disabled onclick="revealAnswer('q5')">Check Answer</button></div>
+  <div class="explanation" id="exp-q5">
+    <div class="correct-line">&#10003; Correct Answer: C — Weight loss, with acetazolamide as a pharmacologic adjunct to reduce CSF production</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect.</strong> High-dose corticosteroids treat <strong>Giant Cell Arteritis</strong>, not IIH. IIH is not an inflammatory condition — it is a disorder of impaired CSF absorption with elevated ICP and completely normal CSF composition.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">B</span><span class="exp-text"><strong>Incorrect.</strong> Sumatriptan is a <strong>triptan for acute migraine and cluster headache</strong>. It has no mechanism to reduce intracranial pressure and is not appropriate for IIH management.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">C</span><span class="exp-text"><strong>Correct.</strong> The <strong>definitive treatment for IIH is weight loss</strong> — reliably reduces intracranial pressure by a mechanism not fully understood. <strong>Acetazolamide (Diamox)</strong> is the standard pharmacologic adjunct; it is a carbonic anhydrase inhibitor that <strong>reduces CSF production</strong>. Vision-threatening cases may require optic nerve sheath fenestration or CSF shunting.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect.</strong> Propranolol is a <strong>beta-blocker for migraine prevention</strong>. It has no established mechanism for lowering intracranial pressure and is not indicated in IIH.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> A therapeutic LP can transiently lower pressure and relieve symptoms but is <strong>not a definitive cure</strong> — ICP returns within hours to days. Definitive management requires addressing the underlying cause (obesity) plus ongoing pharmacotherapy.</span></div>
+  </div>
+</div>
+
+<!-- Q6 -->
+<div class="q-card" id="card-q6">
+  <div class="q-header">
+    <div class="q-num">Q6 <span class="q-type-badge">NOT / INCORRECT</span></div>
+    <div class="q-text">Which of the following is INCORRECT regarding the ICHD-3 diagnostic criteria for migraine without aura?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q6" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>A minimum of five attacks is required to establish the diagnosis.</button>
+    <button class="choice" data-q="q6" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>Each headache attack must last between 4 and 72 hours if untreated.</button>
+    <button class="choice" data-q="q6" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>The headache must be bilateral; unilateral headache excludes the diagnosis.</button>
+    <button class="choice" data-q="q6" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>Nausea and/or vomiting, or both photophobia and phonophobia, must be present during the headache.</button>
+    <button class="choice" data-q="q6" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>At least two of four features must be present: unilateral location, pulsating quality, moderate-severe intensity, and aggravation by routine activity.</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q6" disabled onclick="revealAnswer('q6')">Check Answer</button></div>
+  <div class="explanation" id="exp-q6">
+    <div class="correct-line">&#10003; Correct Answer: C — The headache must be bilateral; unilateral headache excludes the diagnosis.</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect (A is true, not the answer).</strong> ICHD-3 criterion A requires <strong>at least 5 attacks</strong> fulfilling the remaining criteria — this threshold distinguishes migraine from isolated headache events.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">B</span><span class="exp-text"><strong>Incorrect (B is true, not the answer).</strong> Criterion B specifies attacks lasting <strong>4–72 hours</strong> when untreated or unsuccessfully treated.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">C</span><span class="exp-text"><strong>Correct — this IS the incorrect statement.</strong> Migraine is classically <strong>unilateral</strong>, but ICHD-3 states it <strong>can also be bilateral</strong>. Unilateral location is just one of the four criterion C features, and only <strong>two of four</strong> are required. Bilateral migraine does not exclude the diagnosis.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect (D is true, not the answer).</strong> Criterion D requires at least one of: nausea/vomiting OR both photophobia and phonophobia. This distinguishes migraine from TTH, which allows at most one sensitivity and no nausea.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect (E is true, not the answer).</strong> Criterion C requires <strong>at least 2 of 4</strong> features: unilateral location, pulsating quality, moderate-to-severe intensity, aggravation by routine activity — reflecting the clinical heterogeneity of migraine.</span></div>
+  </div>
+</div>
+
+<!-- Q7 -->
+<div class="q-card" id="card-q7">
+  <div class="q-header">
+    <div class="q-num">Q7 <span class="q-type-badge">CLINICAL VIGNETTE</span></div>
+    <div class="q-text">A neurologist wants to prescribe a triptan for acute migraine relief. Which of the following patients would be the most appropriate candidate?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q7" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>A 58-year-old man with a recent coronary artery bypass graft</button>
+    <button class="choice" data-q="q7" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>A 45-year-old woman with uncontrolled hypertension (BP 175/105 mmHg)</button>
+    <button class="choice" data-q="q7" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>A 34-year-old woman with episodic migraine, normal cardiac history, and well-controlled blood pressure</button>
+    <button class="choice" data-q="q7" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>A 62-year-old man with stable angina and coronary stenting three years ago</button>
+    <button class="choice" data-q="q7" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>A 50-year-old woman with migraine and a myocardial infarction treated with thrombolytics two months ago</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q7" disabled onclick="revealAnswer('q7')">Check Answer</button></div>
+  <div class="explanation" id="exp-q7">
+    <div class="correct-line">&#10003; Correct Answer: C — A 34-year-old woman with episodic migraine, normal cardiac history, and well-controlled blood pressure</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect.</strong> Triptans are <strong>serotonin (5-HT1B/1D) agonists that cause vasoconstriction</strong>. Recent CABG represents active coronary artery disease — a clear contraindication. Triptan-induced coronary vasospasm could precipitate a serious cardiac event.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">B</span><span class="exp-text"><strong>Incorrect.</strong> <strong>Uncontrolled hypertension</strong> is a contraindication to triptans. Their vasoconstrictive mechanism can further elevate blood pressure, increasing the risk of stroke or cardiac ischemia. BP must be controlled first.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">C</span><span class="exp-text"><strong>Correct.</strong> A patient with episodic migraine, <strong>no cardiac disease, and well-controlled BP</strong> is the ideal triptan candidate. Triptans are first-line prescription abortive therapy for moderate-to-severe migraine. Subcutaneous formulations work fastest (~15 min); nasal spray and oral tablets offer alternatives with different onset profiles and side effect patterns.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect.</strong> A history of <strong>coronary stenting</strong> indicates established CAD — a contraindication to triptans regardless of current stability. Vasoconstrictive agents in patients with fixed coronary obstruction risk inducing ischemia.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> A <strong>recent MI</strong> is an absolute contraindication to triptans. Alternative acute treatments — such as IV ketorolac, metoclopramide (Reglan), or valproic acid — are appropriate in these cases.</span></div>
+  </div>
+</div>
+
+<!-- Q8 -->
+<div class="q-card" id="card-q8">
+  <div class="q-header">
+    <div class="q-num">Q8 <span class="q-type-badge">COMPLETION / STEM</span></div>
+    <div class="q-text">Up to 80% of migraine patients experience significant neck pain during attacks despite having no cervical pathology. The primary anatomical explanation is that trigeminal pain fibers converge with afferents from which structure at the trigeminal cervical complex?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q8" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>The dorsal motor nucleus of the vagus nerve (CN X)</button>
+    <button class="choice" data-q="q8" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>The upper cervical nerve roots (C2–C3)</button>
+    <button class="choice" data-q="q8" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>The spinal accessory nerve (CN XI) innervating the trapezius</button>
+    <button class="choice" data-q="q8" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>The nucleus ambiguus coordinating autonomic output to neck vasculature</button>
+    <button class="choice" data-q="q8" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>The medial longitudinal fasciculus connecting vestibular and oculomotor nuclei</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q8" disabled onclick="revealAnswer('q8')">Check Answer</button></div>
+  <div class="explanation" id="exp-q8">
+    <div class="correct-line">&#10003; Correct Answer: B — The upper cervical nerve roots (C2–C3)</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect.</strong> The dorsal motor nucleus of the vagus and the periaqueductal gray mediate <strong>nausea</strong> during migraine — not neck pain. These are autonomic structures involved in the GI symptoms of migraine.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">B</span><span class="exp-text"><strong>Correct.</strong> Dural pain fibers (trigeminal origin) converge with afferents from <strong>upper cervical nerve roots C2–C3</strong> at the <strong>Trigeminal Cervical Complex (TCC)</strong>. The brain cannot distinguish the source, interpreting pain as coming from both the head AND the neck — this explains neck pain in up to 80% of migraineurs without any structural cervical pathology. The lecturer explicitly emphasized this point.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">C</span><span class="exp-text"><strong>Incorrect.</strong> CN XI innervates the trapezius and sternocleidomastoid. While these muscles may be secondarily tense, this is not the primary mechanism for neck pain as a direct neurological consequence of trigeminal activation during migraine.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect.</strong> The nucleus ambiguus provides motor innervation to the pharynx and larynx via CN IX and X. It plays no significant role in migraine-associated neck pain.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> The MLF coordinates conjugate eye movements between vestibular and oculomotor nuclei. Lesions cause internuclear ophthalmoplegia (common in MS). It has no role in the referred neck pain of migraine.</span></div>
+  </div>
+</div>
+
+<!-- Q9 -->
+<div class="q-card" id="card-q9">
+  <div class="q-header">
+    <div class="q-num">Q9 <span class="q-type-badge">CLINICAL VIGNETTE</span></div>
+    <div class="q-text">A 47-year-old woman with hypertension presents to the ED with the "worst headache of her life," which began suddenly during exercise and reached full intensity within seconds. She has mild neck stiffness and nausea. She is alert and oriented. Non-contrast CT head is read as normal by radiology. What is the most appropriate next step?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q9" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>Discharge with oral sumatriptan and close outpatient follow-up, as the CT rules out hemorrhage</button>
+    <button class="choice" data-q="q9" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>Perform lumbar puncture to assess for xanthochromia or blood in the CSF</button>
+    <button class="choice" data-q="q9" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>Start high-dose corticosteroids empirically for suspected Giant Cell Arteritis</button>
+    <button class="choice" data-q="q9" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>Prescribe prophylactic topiramate and schedule outpatient MRI in 4–6 weeks</button>
+    <button class="choice" data-q="q9" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>Obtain MRI brain with gadolinium as the definitive next step</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q9" disabled onclick="revealAnswer('q9')">Check Answer</button></div>
+  <div class="explanation" id="exp-q9">
+    <div class="correct-line">&#10003; Correct Answer: B — Perform lumbar puncture to assess for xanthochromia or blood in the CSF</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect — and dangerous.</strong> A normal CT does <strong>not rule out SAH</strong>. CT sensitivity decreases over the first several hours and may miss 2–5% of bleeds early on. Thunderclap headache is <strong>SAH until proven otherwise</strong>. Discharging without further workup could be fatal.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">B</span><span class="exp-text"><strong>Correct.</strong> When CT is negative but clinical suspicion for <strong>subarachnoid hemorrhage</strong> remains high, <strong>lumbar puncture</strong> is mandatory. The LP detects <strong>xanthochromia</strong> — yellow CSF discoloration from bilirubin, a breakdown product of red blood cells — which can be positive even when CT is negative. A positive LP then prompts CTA or MRA to locate the source, followed by DSA if needed to find and treat the aneurysm.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">C</span><span class="exp-text"><strong>Incorrect.</strong> GCA presents in patients <strong>over 50</strong> with temporal headache, jaw claudication, and elevated ESR/CRP — not a thunderclap headache reaching maximum intensity in seconds during exercise in a 47-year-old.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect — and dangerous.</strong> Topiramate is a <strong>preventive migraine medication</strong>, not for acute evaluation. Scheduling an outpatient MRI in weeks is wholly inappropriate for a potential SAH — this is an emergency requiring same-visit workup.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> MRI with gadolinium is excellent for many conditions but has <strong>lower sensitivity than CT for acute subarachnoid blood</strong> in the first 24–48 hours, and is slower. LP is the standard-of-care next step when CT is negative and clinical suspicion remains high.</span></div>
+  </div>
+</div>
+
+<!-- Q10 -->
+<div class="q-card" id="card-q10">
+  <div class="q-header">
+    <div class="q-num">Q10 <span class="q-type-badge">CONTRAST / DISTINCTION</span></div>
+    <div class="q-text">A headache specialist is seeing two patients. Patient A has migraines on 10 days per month for the past 6 months and has not tried any preventive medications. Patient B has migraines on 18 days per month (with at least 8 migrainous days) for the past 5 months and has failed two prior preventive medications. Which statement about botulinum toxin (onabotulinumtoxinA) candidacy is correct?</div>
+  </div>
+  <div class="choices">
+    <button class="choice" data-q="q10" data-val="A" onclick="selectChoice(this)"><span class="letter-badge">A</span>Both patients are appropriate candidates for botulinum toxin.</button>
+    <button class="choice" data-q="q10" data-val="B" onclick="selectChoice(this)"><span class="letter-badge">B</span>Patient A is a better candidate because episodic migraine is the primary FDA-approved indication.</button>
+    <button class="choice" data-q="q10" data-val="C" onclick="selectChoice(this)"><span class="letter-badge">C</span>Only Patient B qualifies; botulinum toxin is FDA-approved only for chronic migraine, defined as at least 15 headache days per month with at least 8 migrainous days, for at least 3 months, after failure of at least 2 preventive therapies.</button>
+    <button class="choice" data-q="q10" data-val="D" onclick="selectChoice(this)"><span class="letter-badge">D</span>Neither patient qualifies because botulinum toxin requires prior failure of CGRP monoclonal antibodies.</button>
+    <button class="choice" data-q="q10" data-val="E" onclick="selectChoice(this)"><span class="letter-badge">E</span>Only Patient A qualifies; botulinum toxin is contraindicated once headache frequency exceeds 15 days per month.</button>
+  </div>
+  <div class="reveal-row"><button class="btn-check" id="btn-q10" disabled onclick="revealAnswer('q10')">Check Answer</button></div>
+  <div class="explanation" id="exp-q10">
+    <div class="correct-line">&#10003; Correct Answer: C — Only Patient B qualifies; botulinum toxin is FDA-approved only for chronic migraine (at least 15 headache days/month with at least 8 migrainous days, for at least 3 months, after failure of at least 2 preventive therapies).</div>
+    <div class="exp-row"><span class="exp-letter wrong">A</span><span class="exp-text"><strong>Incorrect.</strong> Patient A has <strong>episodic migraine</strong> (10 days/month). Botulinum toxin has <strong>not been shown effective for episodic migraine</strong> and is not FDA-approved for this indication. Clinical trials failed to show benefit below the chronic threshold.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">B</span><span class="exp-text"><strong>Incorrect.</strong> Reversed. The FDA indication is specifically for <strong>chronic migraine</strong>, not episodic. Patient A (10 days/month) does not meet the chronic threshold of 15 or more headache days per month.</span></div>
+    <div class="exp-row"><span class="exp-letter correct">C</span><span class="exp-text"><strong>Correct.</strong> <strong>Botulinum toxin (onabotulinumtoxinA)</strong> is FDA-approved exclusively for <strong>chronic migraine</strong>: <strong>at least 15 headache days/month</strong>, with <strong>at least 8 having migrainous features</strong>, for <strong>at least 3 months</strong>, after <strong>failure of at least 2 first-line preventive therapies</strong>. Patient B meets all four criteria. The mechanism likely involves reducing CGRP and other neuropeptide release at presynaptic terminals via SNAP-25 inhibition — though the lecturer noted this has not been definitively proven.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">D</span><span class="exp-text"><strong>Incorrect.</strong> There is no requirement to fail CGRP monoclonal antibodies before botulinum toxin. The prerequisite is failure of <strong>two conventional first-line preventive agents</strong> (e.g., beta-blockers, antiepileptics, antidepressants). Botulinum toxin and CGRP mAbs are parallel options for chronic migraine prevention.</span></div>
+    <div class="exp-row"><span class="exp-letter wrong">E</span><span class="exp-text"><strong>Incorrect.</strong> This is the opposite of reality. The <strong>15 days/month threshold is the entry criterion</strong> for the chronic migraine indication — it is precisely the reason botulinum toxin is indicated, not a contraindication.</span></div>
+  </div>
+</div>
+
+<script>
+const answers = { q1:'C', q2:'B', q3:'C', q4:'C', q5:'C', q6:'C', q7:'C', q8:'B', q9:'B', q10:'C' };
+const state = {};
+for (const q in answers) state[q] = { selected: null, revealed: false };
+let totalAnswered = 0, totalCorrect = 0, showAllActive = false;
+
+function selectChoice(btn) {
+  const q = btn.dataset.q;
+  if (state[q].revealed) return;
+  document.querySelectorAll('[data-q="' + q + '"]').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  state[q].selected = btn.dataset.val;
+  document.getElementById('btn-' + q).disabled = false;
+}
+
+function revealAnswer(q) {
+  if (state[q].revealed) return;
+  state[q].revealed = true;
+  const correct = answers[q];
+  const selected = state[q].selected;
+  const isCorrect = selected === correct;
+  document.querySelectorAll('[data-q="' + q + '"]').forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.val === correct) { btn.classList.remove('selected'); btn.classList.add('correct-reveal'); }
+    else if (btn.dataset.val === selected && !isCorrect) { btn.classList.remove('selected'); btn.classList.add('wrong-reveal'); }
+  });
+  const checkBtn = document.getElementById('btn-' + q);
+  checkBtn.disabled = true;
+  if (isCorrect) { checkBtn.textContent = 'Correct!'; checkBtn.classList.add('result-correct'); }
+  else { checkBtn.textContent = 'Incorrect'; checkBtn.classList.add('result-wrong'); }
+  const exp = document.getElementById('exp-' + q);
+  exp.classList.add('visible');
+  setTimeout(() => exp.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 80);
+  totalAnswered++;
+  if (isCorrect) totalCorrect++;
+  document.getElementById('score-display').textContent = totalCorrect + ' / ' + totalAnswered;
+}
+
+function resetAll() {
+  for (const q in state) {
+    state[q].selected = null; state[q].revealed = false;
+    document.querySelectorAll('[data-q="' + q + '"]').forEach(btn => {
+      btn.disabled = false;
+      btn.classList.remove('selected', 'correct-reveal', 'wrong-reveal');
+    });
+    const cb = document.getElementById('btn-' + q);
+    cb.disabled = true; cb.textContent = 'Check Answer';
+    cb.classList.remove('result-correct', 'result-wrong');
+    document.getElementById('exp-' + q).classList.remove('visible');
+  }
+  totalAnswered = 0; totalCorrect = 0;
+  document.getElementById('score-display').textContent = '0 / 0';
+  if (showAllActive) { showAllActive = false; document.getElementById('show-all-toggle').classList.remove('on'); }
+}
+
+function toggleAll() {
+  showAllActive = !showAllActive;
+  document.getElementById('show-all-toggle').classList.toggle('on', showAllActive);
+  for (const q in answers) {
+    const exp = document.getElementById('exp-' + q);
+    if (showAllActive) {
+      exp.classList.add('visible');
+      document.querySelectorAll('[data-q="' + q + '"]').forEach(btn => {
+        btn.disabled = true;
+        if (btn.dataset.val === answers[q]) btn.classList.add('correct-reveal');
+      });
+      document.getElementById('btn-' + q).disabled = true;
+    } else {
+      if (!state[q].revealed) {
+        exp.classList.remove('visible');
+        document.querySelectorAll('[data-q="' + q + '"]').forEach(btn => {
+          btn.disabled = false;
+          btn.classList.remove('correct-reveal', 'wrong-reveal', 'selected');
+        });
+        const cb = document.getElementById('btn-' + q);
+        cb.disabled = true; cb.textContent = 'Check Answer';
+        cb.classList.remove('result-correct', 'result-wrong');
+      }
+    }
+  }
+}
+</script>
+</body>
+</html>
