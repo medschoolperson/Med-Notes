@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>my notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0; --surface: #ffffff; --border: #e2e0d8;
+    --text: #1a1916; --muted: #7a7870; --accent: #2d5a3d;
+    --accent-light: #e8f0ea; --tag-bg: #1a1916; --tag-text: #f5f4f0;
+    --mono: 'IBM Plex Mono', monospace; --sans: 'IBM Plex Sans', sans-serif;
+  }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+  header {
+    border-bottom: 1px solid var(--border); padding: 1.25rem 2.5rem;
+    display: flex; align-items: baseline; gap: 1rem;
+    background: var(--surface); position: sticky; top: 0; z-index: 10;
+  }
+  header h1 { font-family: var(--mono); font-size: 15px; font-weight: 500; }
+  header .subtitle { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+  main { max-width: 860px; margin: 0 auto; padding: 3rem 2.5rem; }
+  .course { margin-bottom: 3.5rem; }
+  .course-header {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.5rem; padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .course-num {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    background: var(--tag-bg); color: var(--tag-text);
+    padding: 3px 8px; border-radius: 3px; letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .course-name { font-size: 18px; font-weight: 500; letter-spacing: -0.02em; }
+  .exam { margin-bottom: 1.75rem; padding-left: 1rem; border-left: 2px solid var(--border); }
+  .exam-label {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.6rem;
+  }
+  .quiz-list { display: flex; flex-direction: column; gap: 4px; }
+  .quiz-link {
+    display: flex; align-items: center; padding: 10px 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; text-decoration: none; color: var(--text);
+    font-size: 14px; transition: border-color 0.15s, background 0.15s; gap: 1rem;
+  }
+  .quiz-link:hover { border-color: var(--accent); background: var(--accent-light); }
+  .quiz-link:hover .arrow { opacity: 1; transform: translateX(2px); }
+  .quiz-title { font-weight: 400; flex: 1; }
+  .quiz-meta { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .arrow { font-size: 14px; color: var(--accent); opacity: 0; transition: opacity 0.15s, transform 0.15s; }
+  footer {
+    text-align: center; padding: 2rem; font-family: var(--mono);
+    font-size: 11px; color: var(--muted); border-top: 1px solid var(--border);
+  }
+  @media (max-width: 600px) {
+    header, main { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .quiz-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>my notes</h1>
+  <span class="subtitle">/ quizzes</span>
+</header>
+<main id="app"></main>
+<footer id="footer"></footer>
+
+<script>
+// ============================================================
+//  YOUR DATA — this is the only thing you ever need to edit
+//
+//  HOW TO ADD A NEW COURSE:
+//    Copy one { name, folder, exams: [...] } object and paste
+//    it at the end of the COURSES array (before the last ]).
+//
+//  HOW TO ADD A NEW EXAM:
+//    Inside the right course, copy one { label, folder, quizzes: [...] }
+//    object and paste it inside that course's exams array.
+//
+//  HOW TO ADD A NEW QUIZ:
+//    Inside the right exam, copy one { title, file, lec } line
+//    and paste it inside that exam's quizzes array.
+//
+//  FILE PATH is built automatically:
+//    [course.folder] / [exam.folder] / [quiz.file]
+//    e.g.  brain-behavior / exam2 / lecture3-quiz.html
+// ============================================================
+
+const COURSES = [
+
+  {
+    name: "Brain and Behavior",
+    folder: "brain-behavior",
+    exams: [
+
+      {
+        label: "Exam 2",
+        folder: "exam2",
+        quizzes: [
+          { title: "Lecture 1 — Neurons & Action Potentials",  file: "lecture1-quiz.html", lec: "lec 01" },
+          { title: "Lecture 2 — Synaptic Transmission",        file: "lecture2-quiz.html", lec: "lec 02" },
+          // ADD MORE LECTURES HERE — copy the line above ↑
+        ]
+      },
+
+      // ADD MORE EXAMS HERE — copy the exam block above ↑
+
+    ]
+  },
+
+  // ---- ADD A NEW COURSE BELOW THIS LINE ----
+  // {
+  //   name: "Cardiology",
+  //   folder: "cardiology",
+  //   exams: [
+  //     {
+  //       label: "Exam 1",
+  //       folder: "exam1",
+  //       quizzes: [
+  //         { title: "Lecture 1 — Cardiac Anatomy", file: "lecture1-quiz.html", lec: "lec 01" },
+  //       ]
+  //     },
+  //   ]
+  // },
+
+];
+
+// ============================================================
+//  DO NOT EDIT BELOW THIS LINE — page builds itself from above
+// ============================================================
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = COURSES.map((course, ci) => `
+    <section class="course">
+      <div class="course-header">
+        <span class="course-num">${String(ci + 1).padStart(2, '0')}</span>
+        <h2 class="course-name">${course.name}</h2>
+      </div>
+      ${course.exams.map(exam => `
+        <div class="exam">
+          <div class="exam-label">${exam.label}</div>
+          <div class="quiz-list">
+            ${exam.quizzes.map((q, qi) => `
+              <a class="quiz-link" href="${course.folder}/${exam.folder}/${q.file}">
+                <span class="quiz-title">${q.title}</span>
+                <span class="quiz-meta">${q.lec || 'lec ' + String(qi + 1).padStart(2, '0')}</span>
+                <span class="arrow">→</span>
+              </a>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </section>
+  `).join('');
+
+  const total = COURSES.reduce((s, c) => s + c.exams.reduce((s2, e) => s2 + e.quizzes.length, 0), 0);
+  document.getElementById('footer').textContent =
+    `${COURSES.length} course${COURSES.length !== 1 ? 's' : ''} · ${total} quiz${total !== 1 ? 'zes' : ''} · github pages`;
+}
+
+render();
+</script>
+</body>
+</html>
